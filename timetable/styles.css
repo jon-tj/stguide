@@ -1,6 +1,6 @@
 main {
     margin: auto;
-    width: min(100%, 800px);
+    width: min(100%, 900px);
     padding: 1rem;
     font-family: system-ui, sans-serif;
 }
@@ -29,7 +29,7 @@ main {
 
 /* Timeline */
 .timeline-wrapper {
-    overflow-x: auto;
+    overflow: hidden;
 }
 .timeline-header {
     display: grid;
@@ -51,6 +51,8 @@ main {
     display: grid;
     grid-template-columns: 50px repeat(5, 1fr);
     position: relative;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 .timeline-gutter {
     position: relative;

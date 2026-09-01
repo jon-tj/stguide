@@ -27,7 +27,7 @@
 
   // --- Size slider ---
   const SIZE_STORAGE_KEY = 'st-timetable-size';
-  const SIZE_VALUES = [50, 100, 200]; // px per hour
+  const SIZE_VALUES = [30, 60, 120]; // px per hour
   const sizeSlider = document.getElementById('size-slider');
   sizeSlider.value = localStorage.getItem(SIZE_STORAGE_KEY) ?? '1';
   sizeSlider.addEventListener('input', () => {
@@ -120,26 +120,76 @@
       }
     }
 
-    // Course blocks
+    // Course blocks — merge consecutive periods per course per day, then split width on overlaps
+    // 1. Build merged spans: { course, day, startPeriod, endPeriod }
+    const spans = [];
     for (const c of courses) {
+      // Group periods by day
+      const byDay = {};
       for (const p of c.periods) {
         const day = parseInt(p[0]);
-        const periodN = parseInt(p[1], 16);
-        const startH = 8 + periodN;
-        const y = (startH - minH) * scale;
-        const h = (50 / 60) * scale; // 50 minutes
+        const pN = parseInt(p[1], 16);
+        if (!byDay[day]) byDay[day] = [];
+        byDay[day].push(pN);
+      }
+      for (const [day, periods] of Object.entries(byDay)) {
+        periods.sort((a, b) => a - b);
+        let start = periods[0], end = periods[0];
+        for (let i = 1; i < periods.length; i++) {
+          if (periods[i] === end + 1) {
+            end = periods[i];
+          } else {
+            spans.push({ course: c, day: parseInt(day), start, end });
+            start = end = periods[i];
+          }
+        }
+        spans.push({ course: c, day: parseInt(day), start, end });
+      }
+    }
 
-        const col = document.querySelector(`.timeline-day[data-day="${day}"]`);
-        if (!col) continue;
+    // 2. For each span, find overlapping spans on same day to split width
+    // Two spans overlap if their time ranges intersect
+    const overlaps = (a, b) => a.day === b.day && a.start <= b.end && b.start <= a.end;
+
+    // Group overlapping spans into clusters per day
+    const placed = new Set();
+    for (const span of spans) {
+      if (placed.has(span)) continue;
+      // Find all spans overlapping with this cluster
+      const cluster = [span];
+      placed.add(span);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const other of spans) {
+          if (placed.has(other)) continue;
+          if (cluster.some(s => overlaps(s, other))) {
+            cluster.push(other);
+            placed.add(other);
+            changed = true;
+          }
+        }
+      }
+      const count = cluster.length;
+      cluster.forEach((s, i) => {
+        const startH = 8 + s.start;
+        const durationH = (s.end - s.start) + 50 / 60; // spans + last period's 50min
+        const y = (startH - minH) * scale;
+        const h = durationH * scale;
+        const col = document.querySelector(`.timeline-day[data-day="${s.day}"]`);
+        if (!col) return;
 
         const div = document.createElement('div');
         div.className = 'course-block';
         div.style.top = `${y}px`;
         div.style.height = `${h}px`;
-        div.innerHTML = `<div class="cb-name">${esc(c.name)}</div>${c.location ? `<div class="cb-loc">${esc(c.location)}</div>` : ''}`;
-        div.addEventListener('click', () => showDetails(c.id));
+        div.style.left = `calc(2px + ${(i / count)} * (100% - 4px))`;
+        div.style.width = `calc(${(1 / count)} * (100% - 4px))`;
+        div.style.right = 'auto';
+        div.innerHTML = `<div class="cb-name">${esc(s.course.name)}</div>${s.course.location ? `<div class="cb-loc">${esc(s.course.location)}</div>` : ''}`;
+        div.addEventListener('click', () => showDetails(s.course.id, s));
         col.appendChild(div);
-      }
+      });
     }
   }
 
@@ -159,14 +209,26 @@
   function render() { renderTable(); renderList(); }
 
   // --- Details modal ---
-  function showDetails(id) {
+  function showDetails(id, span) {
     const c = courses.find(x => x.id === id);
     if (!c) return;
     document.getElementById('details-name').textContent = c.name;
     document.getElementById('details-location').textContent = c.location || '—';
     document.getElementById('details-professor').textContent = c.professor || '—';
     document.getElementById('details-email').textContent = c.email || '—';
-    document.getElementById('details-periods').textContent = c.periods.map(periodLabel).join(', ') || '—';
+
+    if (span) {
+      const dayName = DAYS[span.day - 1];
+      const startHour = 8 + span.start;
+      const endHour = 8 + span.end;
+      const timeStr = `${dayName} ${startHour}:00–${endHour}:50`;
+      const periodStr = span.start === span.end
+        ? `period ${span.start.toString(16)}`
+        : `periods ${span.start.toString(16)}–${span.end.toString(16)}`;
+      document.getElementById('details-periods').textContent = `${timeStr} (${periodStr})`;
+    } else {
+      document.getElementById('details-periods').textContent = c.periods.map(periodLabel).join(', ') || '—';
+    }
     detailsModal.classList.add('open');
 
     document.getElementById('details-edit').onclick = () => {
