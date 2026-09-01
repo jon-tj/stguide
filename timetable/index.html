@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ST Timetable</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main>
+      <section class="tabs-controls">
+        <div class="tab active" data-tab="table">
+          <span>Table</span>
+        </div>
+        <div class="tab" data-tab="list">
+          <span>List</span>
+        </div>
+      </section>
+      <section class="courses">
+        <section class="tab-content active" data-tab="table">
+          <div class="timeline-wrapper">
+            <div class="timeline-header">
+              <div class="timeline-gutter"></div>
+              <div class="timeline-day-header">Mon</div>
+              <div class="timeline-day-header">Tue</div>
+              <div class="timeline-day-header">Wed</div>
+              <div class="timeline-day-header">Thu</div>
+              <div class="timeline-day-header">Fri</div>
+            </div>
+            <div class="timeline-body" id="timeline-body">
+              <div class="timeline-gutter" id="timeline-gutter"></div>
+              <div class="timeline-day" data-day="1"></div>
+              <div class="timeline-day" data-day="2"></div>
+              <div class="timeline-day" data-day="3"></div>
+              <div class="timeline-day" data-day="4"></div>
+              <div class="timeline-day" data-day="5"></div>
+            </div>
+          </div>
+        </section>
+        <section class="tab-content" data-tab="list">
+          <ul id="course-list"></ul>
+        </section>
+      </section>
+      <section class="course-controls">
+        <label class="checkbox-label"><input type="checkbox" id="chk-meals"> Meals</label>
+        <label class="checkbox-label">Size
+          <input type="range" id="size-slider" min="0" max="2" step="1" value="1">
+        </label>
+        <button id="btn-add">Add</button>
+        <button id="btn-share">Share</button>
+      </section>
+    </main>
+
+    <!-- Course details modal -->
+    <div class="modal-overlay" id="details-modal">
+      <div class="modal">
+        <h2 id="details-name"></h2>
+        <p><strong>Location:</strong> <span id="details-location"></span></p>
+        <p><strong>Professor:</strong> <span id="details-professor"></span></p>
+        <p><strong>Email:</strong> <span id="details-email"></span></p>
+        <p><strong>Periods:</strong> <span id="details-periods"></span></p>
+        <div class="modal-actions">
+          <button id="details-edit">Edit</button>
+          <button id="details-delete" class="danger">Delete</button>
+          <button id="details-close" class="secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit course modal -->
+    <div class="modal-overlay" id="form-modal">
+      <div class="modal">
+        <h2 id="form-title">Add Course</h2>
+        <form id="course-form">
+          <label>Name <input type="text" id="f-name" required></label>
+          <label>Location <input type="text" id="f-location"></label>
+          <label>Professor <input type="text" id="f-professor"></label>
+          <label>Email <input type="email" id="f-email"></label>
+          <label>Periods <input type="text" id="f-periods" placeholder="e.g. 10,21,3a" required>
+            <small>Day (1-5) + hex period (0=8:00, 9=17:00, a=18:00, f=23:00)</small>
+          </label>
+          <div class="modal-actions">
+            <button type="submit">Save</button>
+            <button type="button" id="form-cancel" class="secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Share modal -->
+    <div class="modal-overlay" id="share-modal">
+      <div class="modal">
+        <h2>Share Timetable</h2>
+        <p>Copy this link to share your timetable:</p>
+        <input type="text" id="share-link" readonly>
+        <div class="modal-actions">
+          <button id="share-copy">Copy</button>
+          <button id="share-close" class="secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import modal -->
+    <div class="modal-overlay" id="import-modal">
+      <div class="modal">
+        <h2>Shared Timetable</h2>
+        <p>Someone shared their timetable with you. What would you like to do?</p>
+        <ul id="import-preview"></ul>
+        <div class="modal-actions">
+          <button id="import-add">Add</button>
+          <button id="import-replace" class="danger">Replace</button>
+          <button id="import-cancel" class="secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="scripts/app.js"></script>
+  </body>
+</html>
