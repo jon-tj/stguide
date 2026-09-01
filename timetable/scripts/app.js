@@ -18,6 +18,24 @@
 
   const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
 
+  // Color palette for courses
+  const PALETTE = [
+    { bg: '#dbeafe', border: '#2563eb' },
+    { bg: '#dcfce7', border: '#16a34a' },
+    { bg: '#fce7f3', border: '#db2777' },
+    { bg: '#e0e7ff', border: '#4f46e5' },
+    { bg: '#ffedd5', border: '#ea580c' },
+    { bg: '#f3e8ff', border: '#9333ea' },
+    { bg: '#ccfbf1', border: '#0d9488' },
+    { bg: '#fee2e2', border: '#dc2626' },
+    { bg: '#e0f2fe', border: '#0284c7' },
+    { bg: '#fdf4ff', border: '#a21caf' },
+  ];
+  function courseColor(c) {
+    const idx = courses.indexOf(c);
+    return PALETTE[idx % PALETTE.length];
+  }
+
   // DOM refs
   const timelineBody = document.getElementById('timeline-body');
   const timelineGutter = document.getElementById('timeline-gutter');
@@ -179,6 +197,7 @@
         const col = document.querySelector(`.timeline-day[data-day="${s.day}"]`);
         if (!col) return;
 
+        const color = courseColor(s.course);
         const div = document.createElement('div');
         div.className = 'course-block';
         div.style.top = `${y}px`;
@@ -186,6 +205,8 @@
         div.style.left = `calc(2px + ${(i / count)} * (100% - 4px))`;
         div.style.width = `calc(${(1 / count)} * (100% - 4px))`;
         div.style.right = 'auto';
+        div.style.background = color.bg;
+        div.style.borderLeftColor = color.border;
         div.innerHTML = `<div class="cb-name">${esc(s.course.name)}</div>${s.course.location ? `<div class="cb-loc">${esc(s.course.location)}</div>` : ''}`;
         div.addEventListener('click', () => showDetails(s.course.id, s));
         col.appendChild(div);
@@ -196,7 +217,10 @@
   function renderList() {
     courseList.innerHTML = '';
     for (const c of courses) {
+      const color = courseColor(c);
       const li = document.createElement('li');
+      li.style.borderLeft = `4px solid ${color.border}`;
+      li.style.background = color.bg;
       li.innerHTML = `<div><div class="course-info">${esc(c.name)}</div><div class="course-sub">${esc(c.location)} · ${esc(c.professor)}</div></div>`;
       li.addEventListener('click', () => showDetails(c.id));
       courseList.appendChild(li);
@@ -393,6 +417,17 @@
     d.textContent = s;
     return d.innerHTML;
   }
+
+  // --- Download as PNG ---
+  document.getElementById('btn-download').addEventListener('click', () => {
+    const target = document.querySelector('.timeline-wrapper');
+    html2canvas(target, { backgroundColor: '#ffffff' }).then(canvas => {
+      const a = document.createElement('a');
+      a.download = 'timetable.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+  });
 
   render();
   checkImport();
