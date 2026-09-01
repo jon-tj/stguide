@@ -238,8 +238,21 @@
     if (!c) return;
     document.getElementById('details-name').textContent = c.name;
     document.getElementById('details-location').textContent = c.location || '—';
-    document.getElementById('details-professor').textContent = c.professor || '—';
-    document.getElementById('details-email').textContent = c.email || '—';
+
+    const profRow = document.getElementById('details-professor').parentElement;
+    const emailRow = document.getElementById('details-email').parentElement;
+    if (c.professor) {
+      document.getElementById('details-professor').textContent = c.professor;
+      profRow.style.display = '';
+    } else {
+      profRow.style.display = 'none';
+    }
+    if (c.email) {
+      document.getElementById('details-email').textContent = c.email;
+      emailRow.style.display = '';
+    } else {
+      emailRow.style.display = 'none';
+    }
 
     if (span) {
       const dayName = DAYS[span.day - 1];
