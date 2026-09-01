@@ -457,7 +457,17 @@
   // --- Download as PNG ---
   document.getElementById('btn-download').addEventListener('click', () => {
     const target = document.querySelector('.timeline-wrapper');
+    // Temporarily hide now-lines and today header highlight
+    const nowLines = target.querySelectorAll('.now-line');
+    const todayHeader = target.querySelector('.timeline-day-header.today');
+    nowLines.forEach(el => el.style.display = 'none');
+    if (todayHeader) todayHeader.classList.remove('today');
+
     html2canvas(target, { backgroundColor: '#ffffff' }).then(canvas => {
+      // Restore
+      nowLines.forEach(el => el.style.display = '');
+      if (todayHeader) todayHeader.classList.add('today');
+
       const a = document.createElement('a');
       a.download = 'timetable.png';
       a.href = canvas.toDataURL('image/png');
