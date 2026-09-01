@@ -212,6 +212,29 @@
         col.appendChild(div);
       });
     }
+
+    // Current time indicator
+    const now = new Date();
+    const todayDay = now.getDay(); // 0=Sun, 1=Mon..5=Fri
+    if (todayDay >= 1 && todayDay <= 5) {
+      const nowH = now.getHours() + now.getMinutes() / 60;
+      if (nowH >= minH && nowH <= maxH) {
+        const y = (nowH - minH) * scale;
+        document.querySelectorAll('.timeline-day').forEach(col => {
+          const line = document.createElement('div');
+          line.className = 'now-line';
+          line.style.top = `${y}px`;
+          col.appendChild(line);
+        });
+      }
+    }
+
+    // Highlight today's header
+    document.querySelectorAll('.timeline-day-header').forEach(el => el.classList.remove('today'));
+    if (todayDay >= 1 && todayDay <= 5) {
+      const headers = document.querySelectorAll('.timeline-day-header');
+      headers[todayDay - 1].classList.add('today');
+    }
   }
 
   function renderList() {
