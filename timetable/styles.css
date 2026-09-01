@@ -153,6 +153,12 @@ main {
 }
 
 /* Controls */
+.table-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
 .course-controls {
     margin-top: 1rem;
     display: flex;
@@ -164,7 +170,6 @@ main {
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    margin-right: auto;
     cursor: pointer;
     user-select: none;
 }
@@ -250,4 +255,10 @@ button.danger:hover { background: #b91c1c; }
     padding-left: 1.2rem;
     margin: 0.5rem 0;
     font-size: 0.9rem;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    body { margin: 0; }
+    main { padding: 0.5rem; }
 }

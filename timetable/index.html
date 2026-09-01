@@ -37,19 +37,21 @@
               <div class="timeline-day" data-day="5"></div>
             </div>
           </div>
+          <div class="table-controls">
+            <label class="checkbox-label"><input type="checkbox" id="chk-meals"> Meals</label>
+            <label class="checkbox-label">Size
+              <input type="range" id="size-slider" min="0" max="2" step="1" value="1">
+            </label>
+          </div>
         </section>
         <section class="tab-content" data-tab="list">
           <ul id="course-list"></ul>
         </section>
       </section>
       <section class="course-controls">
-        <label class="checkbox-label"><input type="checkbox" id="chk-meals"> Meals</label>
-        <label class="checkbox-label">Size
-          <input type="range" id="size-slider" min="0" max="2" step="1" value="1">
-        </label>
         <button id="btn-add">Add</button>
         <button id="btn-share">Share</button>
-        <button id="btn-download" class="secondary">PNG</button>
+        <button id="btn-download">PNG</button>
       </section>
     </main>
 
